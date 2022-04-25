@@ -6,6 +6,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
+ *测试API的实体
+ *
  * @author C.Wang
  * @CreateTime 2022/4/24 19:48
  */

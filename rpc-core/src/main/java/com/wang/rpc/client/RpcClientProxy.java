@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import com.wang.rpc.entity.RpcRequest;
 import com.wang.rpc.entity.RpcResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 客户端方面，由于在客户端这一侧并没有接口的具体实现类，就没有办法直接生成实例对象。
@@ -18,6 +20,8 @@ import com.wang.rpc.entity.RpcResponse;
 
 
 public class RpcClientProxy implements InvocationHandler {
+    private static final Logger logger = LoggerFactory.getLogger(RpcClientProxy.class);
+
     private String host;
     private int port;
 
@@ -45,6 +49,7 @@ public class RpcClientProxy implements InvocationHandler {
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        logger.info("调用方法: {}#{}", method.getDeclaringClass().getName(), method.getName());
         //使用Builder模式来生成RpcRequest对象
         RpcRequest rpcRequest = RpcRequest.builder()
                 .interfaceName(method.getDeclaringClass().getName())
@@ -55,6 +60,6 @@ public class RpcClientProxy implements InvocationHandler {
 
         //发送的逻辑，使用一个RpcClient对象来实现，这个对象的作用，就是将一个对象发送过去，并接受返回的对象
         RpcClient rpcClient = new RpcClient();
-        return ((RpcResponse) rpcClient.sendRequest(rpcRequest, host, port)).getData();
+        return rpcClient.sendRequest(rpcRequest, host, port);
     }
 }

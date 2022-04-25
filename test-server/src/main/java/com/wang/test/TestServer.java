@@ -1,6 +1,7 @@
 package com.wang.test;
 
 import com.wang.rpc.client.RpcClient;
+import com.wang.rpc.registry.DefaultServiceRegistry;
 import com.wang.rpc.server.RpcServer;
 
 /**
@@ -17,7 +18,13 @@ import com.wang.rpc.server.RpcServer;
 public class TestServer {
     public static void main(String[] args) {
         HelloServiceImpl helloService = new HelloServiceImpl();
-        RpcServer rpcServer = new RpcServer();
-        rpcServer.register(helloService, 9000);
+
+        //RpcServer rpcServer = new RpcServer();
+        //rpcServer.register(helloService, 9000);//注册完helloService后，服务器就自行启动了。一个服务器只能注册一个服务
+
+        DefaultServiceRegistry serviceRegistry = new DefaultServiceRegistry();
+        serviceRegistry.register(helloService);
+        RpcServer rpcServer = new RpcServer(serviceRegistry);
+        rpcServer.start(9000);
     }
 }

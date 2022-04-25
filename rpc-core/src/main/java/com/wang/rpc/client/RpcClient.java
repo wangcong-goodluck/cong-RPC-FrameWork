@@ -2,6 +2,9 @@ package com.wang.rpc.client;
 
 import com.wang.rpc.entity.RpcRequest;
 import com.wang.rpc.entity.RpcResponse;
+import com.wang.rpc.enumeration.ResponseCode;
+import com.wang.rpc.enumeration.RpcError;
+import com.wang.rpc.exception.RpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +35,19 @@ public class RpcClient {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             objectOutputStream.writeObject(rpcRequest);
             objectOutputStream.flush();
-            return objectInputStream.readObject();
+            RpcResponse rpcResponse = (RpcResponse) objectInputStream.readObject();
+            if(rpcResponse == null) {
+                logger.error("服务调用失败，service：{}", rpcRequest.getInterfaceName());
+                throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, " service:" + rpcRequest.getInterfaceName());
+            }
+            if(rpcResponse.getStatusCode() == null || rpcResponse.getStatusCode() != ResponseCode.SUCCESS.getCode()) {
+                logger.error("调用服务失败, service: {}, response:{}", rpcRequest.getInterfaceName(), rpcResponse);
+                throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, " service:" + rpcRequest.getInterfaceName());
+            }
+            return rpcResponse.getData();
         } catch (IOException | ClassNotFoundException e) {
             logger.error("调用时有错误发送：" + e);
-            return null;
+            throw new RpcException("服务调用失败: ", e);
         }
     }
 }

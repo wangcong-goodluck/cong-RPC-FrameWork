@@ -18,7 +18,7 @@ import java.net.ResponseCache;
 @Data
 public class RpcResponse<T> implements Serializable{
     /**
-     * 相应状态码
+     * 响应状态码
      */
     private Integer statusCode;
 
