@@ -1,5 +1,6 @@
 package com.wang.rpc.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,7 +19,7 @@ import java.io.Serializable;
  * 到时候传递时传递这个对象即可，即RpcRequest对象
  */
 @Data
-@Builder
+@AllArgsConstructor
 public class RpcRequest implements Serializable {
     /**
      * 待调用接口名称

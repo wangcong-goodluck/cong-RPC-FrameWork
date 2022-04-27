@@ -2,6 +2,7 @@ package com.wang.rpc.entity;
 
 import com.wang.rpc.enumeration.ResponseCode;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.net.ResponseCache;
@@ -17,6 +18,9 @@ import java.net.ResponseCache;
  */
 @Data
 public class RpcResponse<T> implements Serializable{
+
+    public RpcResponse() {}
+
     /**
      * 响应状态码
      */
