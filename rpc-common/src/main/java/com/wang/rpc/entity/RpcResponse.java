@@ -36,6 +36,8 @@ public class RpcResponse<T> implements Serializable{
      */
     private T data;
 
+
+
     //快速生成成功与失败的响应对象
     public static <T> RpcResponse<T> success(T data) {
         RpcResponse<T> response = new RpcResponse<>();

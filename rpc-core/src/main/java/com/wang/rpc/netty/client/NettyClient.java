@@ -27,14 +27,7 @@ public class NettyClient implements RpcClient {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
-    private String host;
-    private int port;
     private static final Bootstrap bootstrap;
-
-    public NettyClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
 
     /**
      * 在静态代码块中直接配置好Netty客户端，等待发送数据时启动
@@ -54,6 +47,14 @@ public class NettyClient implements RpcClient {
                                 .addLast(new NettyClientHandler());
                     }
                 });
+    }
+
+    private String host;
+    private int port;
+
+    public NettyClient(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
 
     @Override

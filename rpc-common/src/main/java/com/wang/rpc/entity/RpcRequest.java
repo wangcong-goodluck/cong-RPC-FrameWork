@@ -41,4 +41,7 @@ public class RpcRequest implements Serializable {
      */
     private Class<?>[] paramTypes;
 
+    public RpcRequest() {
+    }
+
 }
