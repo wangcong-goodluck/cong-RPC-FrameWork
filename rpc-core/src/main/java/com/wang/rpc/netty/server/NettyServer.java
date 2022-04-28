@@ -4,6 +4,7 @@ import com.wang.rpc.RpcServer;
 import com.wang.rpc.codec.CommonDecoder;
 import com.wang.rpc.codec.CommonEncoder;
 import com.wang.rpc.serializer.JsonSerializer;
+import com.wang.rpc.serializer.KryoSerializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -48,7 +49,7 @@ public class NettyServer implements RpcServer {
                              * 体现了Netty中一个重要的设计模式：责任链模式
                              * 责任链上有多个处理器，每个处理器都会对数据进行加工，并将处理后的数据传给下一个处理器
                              */
-                            pipeline.addLast(new CommonEncoder(new JsonSerializer()));//编码器
+                            pipeline.addLast(new CommonEncoder(new KryoSerializer()));//编码器
                             pipeline.addLast(new CommonDecoder());//解码器
                             pipeline.addLast(new NettyServerHandler());//数据处理器
                         }
