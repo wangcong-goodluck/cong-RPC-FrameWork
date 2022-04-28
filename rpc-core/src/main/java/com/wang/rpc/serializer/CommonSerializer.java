@@ -25,6 +25,8 @@ public interface CommonSerializer {
                 return new KryoSerializer();//Kryo,作为默认序列化器
             case 1:
                 return new JsonSerializer();
+            case 2:
+                return new HessianSerializer();
             default:
                 return null;
         }
