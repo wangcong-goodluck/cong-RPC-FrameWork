@@ -3,6 +3,9 @@ package com.wang.rpc.netty.server;
 import com.wang.rpc.RpcServer;
 import com.wang.rpc.codec.CommonDecoder;
 import com.wang.rpc.codec.CommonEncoder;
+import com.wang.rpc.enumeration.RpcError;
+import com.wang.rpc.exception.RpcException;
+import com.wang.rpc.serializer.CommonSerializer;
 import com.wang.rpc.serializer.JsonSerializer;
 import com.wang.rpc.serializer.KryoSerializer;
 import io.netty.bootstrap.ServerBootstrap;
@@ -28,8 +31,14 @@ public class NettyServer implements RpcServer {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
+    private CommonSerializer serializer;
+
     @Override
     public void start(int port) {
+        if (serializer == null) {
+            logger.error("未设置序列化器");
+            throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
+        }
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -49,7 +58,7 @@ public class NettyServer implements RpcServer {
                              * 体现了Netty中一个重要的设计模式：责任链模式
                              * 责任链上有多个处理器，每个处理器都会对数据进行加工，并将处理后的数据传给下一个处理器
                              */
-                            pipeline.addLast(new CommonEncoder(new KryoSerializer()));//编码器
+                            pipeline.addLast(new CommonEncoder(serializer));//编码器
                             pipeline.addLast(new CommonDecoder());//解码器
                             pipeline.addLast(new NettyServerHandler());//数据处理器
                         }
@@ -63,5 +72,10 @@ public class NettyServer implements RpcServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
+
+    @Override
+    public void setSerializer(CommonSerializer serializer) {
+        this.serializer = serializer;
     }
 }

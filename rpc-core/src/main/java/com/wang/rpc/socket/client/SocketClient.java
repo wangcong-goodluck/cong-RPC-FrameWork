@@ -6,12 +6,13 @@ import com.wang.rpc.entity.RpcResponse;
 import com.wang.rpc.enumeration.ResponseCode;
 import com.wang.rpc.enumeration.RpcError;
 import com.wang.rpc.exception.RpcException;
+import com.wang.rpc.serializer.CommonSerializer;
+import com.wang.rpc.util.ObjectReader;
+import com.wang.rpc.util.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -33,6 +34,8 @@ public class SocketClient implements RpcClient {
         this.port = port;
     }
 
+    private CommonSerializer serializer;
+
     /**
      * 直接使用Java的序列化方式，通过Socket传输。
      * 创建一个Socket，获取ObjectOutputStream对象，然后把需要发送的对象传进去即可，
@@ -40,12 +43,16 @@ public class SocketClient implements RpcClient {
      */
     @Override
     public Object sendRequest(RpcRequest rpcRequest) {
+        if (serializer == null) {
+            logger.error("未设置序列化器");
+            throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
+        }
         try (Socket socket = new Socket(host, port)) {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            objectOutputStream.writeObject(rpcRequest);
-            objectOutputStream.flush();
-            RpcResponse rpcResponse = (RpcResponse) objectInputStream.readObject();
+            OutputStream outputStream = socket.getOutputStream();
+            InputStream inputStream = socket.getInputStream();
+            ObjectWriter.writeObject(outputStream, rpcRequest, serializer);
+            Object obj = ObjectReader.readObject(inputStream);
+            RpcResponse rpcResponse = (RpcResponse) obj;
             if(rpcResponse == null) {
                 logger.error("服务调用失败，service：{}", rpcRequest.getInterfaceName());
                 throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, " service:" + rpcRequest.getInterfaceName());
@@ -55,9 +62,14 @@ public class SocketClient implements RpcClient {
                 throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, " service:" + rpcRequest.getInterfaceName());
             }
             return rpcResponse.getData();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             logger.error("调用时有错误发生：", e);
             throw new RpcException("服务调用失败: ", e);
         }
+    }
+
+    @Override
+    public void setSerializer(CommonSerializer serializer) {
+        this.serializer = serializer;
     }
 }

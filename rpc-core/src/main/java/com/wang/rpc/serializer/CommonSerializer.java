@@ -9,14 +9,13 @@ package com.wang.rpc.serializer;
 
 
 public interface CommonSerializer {
-    //序列化
-    byte[] serialize(Object obj);
 
-    //反序列化
-    Object deserialize(byte[] bytes, Class<?> clazz);
+    Integer KRYO_SERIALIZER = 0;
+    Integer JSON_SERIALIZER = 1;
+    Integer HESSIAN_SERIALIZER = 2;
+    Integer PROTOBUF_SERIALIZER = 3;
 
-    //获得该序列化器的编号
-    int getCode();
+    Integer DEFAULT_SERIALIZER = KRYO_SERIALIZER;
 
     //根据编号获取序列化器
     static CommonSerializer getByCode(int code) {
@@ -27,8 +26,18 @@ public interface CommonSerializer {
                 return new JsonSerializer();
             case 2:
                 return new HessianSerializer();
+
             default:
                 return null;
         }
     }
+
+    //序列化
+    byte[] serialize(Object obj);
+
+    //反序列化
+    Object deserialize(byte[] bytes, Class<?> clazz);
+
+    //获得该序列化器的编号
+    int getCode();
 }

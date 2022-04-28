@@ -1,6 +1,7 @@
 package com.wang.test;
 
 import com.wang.rpc.registry.DefaultServiceRegistry;
+import com.wang.rpc.serializer.HessianSerializer;
 import com.wang.rpc.socket.server.SocketServer;
 
 /**
@@ -23,7 +24,8 @@ public class SocketTestServer {
 
         DefaultServiceRegistry serviceRegistry = new DefaultServiceRegistry();
         serviceRegistry.register(helloService);
-        SocketServer rpcServer = new SocketServer(serviceRegistry);
-        rpcServer.start(9000);
+        SocketServer socketServer = new SocketServer(serviceRegistry);
+        socketServer.setSerializer(new HessianSerializer());
+        socketServer.start(9000);
     }
 }
