@@ -1,6 +1,7 @@
 package com.wang.rpc.socket.client;
 
 import com.wang.rpc.RpcClient;
+import com.wang.rpc.RpcMessageChecker;
 import com.wang.rpc.entity.RpcRequest;
 import com.wang.rpc.entity.RpcResponse;
 import com.wang.rpc.enumeration.ResponseCode;
@@ -61,6 +62,7 @@ public class SocketClient implements RpcClient {
                 logger.error("调用服务失败, service: {}, response:{}", rpcRequest.getInterfaceName(), rpcResponse);
                 throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, " service:" + rpcRequest.getInterfaceName());
             }
+            RpcMessageChecker.check(rpcRequest, rpcResponse);
             return rpcResponse.getData();
         } catch (IOException e) {
             logger.error("调用时有错误发生：", e);

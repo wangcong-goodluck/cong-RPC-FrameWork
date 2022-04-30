@@ -1,6 +1,7 @@
 package com.wang.rpc.netty.client;
 
 import com.wang.rpc.RpcClient;
+import com.wang.rpc.RpcMessageChecker;
 import com.wang.rpc.codec.CommonDecoder;
 import com.wang.rpc.codec.CommonEncoder;
 import com.wang.rpc.entity.RpcRequest;
@@ -83,8 +84,9 @@ public class NettyClient implements RpcClient {
                 });
                 channel.closeFuture().sync();
                 //通过AttributeKey的方式阻塞获得返回结果
-                AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse");
+                AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse" + rpcRequest.getRequestId());
                 RpcResponse rpcResponse = channel.attr(key).get();
+                RpcMessageChecker.check(rpcRequest, rpcResponse);
                 return rpcResponse.getData();
             }
         } catch (InterruptedException e) {

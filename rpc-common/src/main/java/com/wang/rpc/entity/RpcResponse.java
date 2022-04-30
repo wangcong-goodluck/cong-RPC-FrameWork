@@ -17,9 +17,10 @@ import java.net.ResponseCache;
  * 如果调用成功的话，显然需要返回值，如果调用失败了，就需要失败的信息，这里封装一个RpcResponse对象。
  */
 @Data
-public class RpcResponse<T> implements Serializable{
+public class RpcResponse<T> implements Serializable {
 
-    public RpcResponse() {}
+    public RpcResponse() {
+    }
 
     /**
      * 响应状态码
@@ -36,18 +37,24 @@ public class RpcResponse<T> implements Serializable{
      */
     private T data;
 
+    /**
+     * 响应对应的请求号
+     */
+    private String requestId;
 
 
     //快速生成成功与失败的响应对象
-    public static <T> RpcResponse<T> success(T data) {
+    public static <T> RpcResponse<T> success(T data, String requestId) {
         RpcResponse<T> response = new RpcResponse<>();
+        response.setRequestId(requestId);
         response.setStatusCode(ResponseCode.SUCCESS.getCode());
         response.setData(data);
         return response;
     }
 
-    public static <T> RpcResponse<T> fail(ResponseCode code) {
+    public static <T> RpcResponse<T> fail(ResponseCode code, String requestId) {
         RpcResponse<T> response = new RpcResponse<>();
+        response.setRequestId(requestId);
         response.setStatusCode(code.getCode());
         response.setMessage(code.getMessage());
         return response;
