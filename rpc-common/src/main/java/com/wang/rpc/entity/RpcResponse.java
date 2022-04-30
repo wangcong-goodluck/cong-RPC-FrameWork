@@ -17,10 +17,8 @@ import java.net.ResponseCache;
  * 如果调用成功的话，显然需要返回值，如果调用失败了，就需要失败的信息，这里封装一个RpcResponse对象。
  */
 @Data
+@NoArgsConstructor
 public class RpcResponse<T> implements Serializable {
-
-    public RpcResponse() {
-    }
 
     /**
      * 响应状态码

@@ -3,6 +3,7 @@ package com.wang.rpc.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -19,6 +20,7 @@ import java.io.Serializable;
  * 到时候传递时传递这个对象即可，即RpcRequest对象
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class RpcRequest implements Serializable {
 
@@ -47,7 +49,5 @@ public class RpcRequest implements Serializable {
      */
     private Class<?>[] paramTypes;
 
-    public RpcRequest() {
-    }
 
 }

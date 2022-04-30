@@ -6,6 +6,7 @@ import com.wang.rpc.netty.server.NettyServer;
 import com.wang.rpc.registry.DefaultServiceRegistry;
 import com.wang.rpc.registry.ServiceRegistry;
 import com.wang.rpc.serializer.KryoSerializer;
+import com.wang.rpc.serializer.ProtobufSerializer;
 
 /**
  *  测试用Netty服务提供者（服务端）
@@ -21,7 +22,7 @@ public class NettyTestServer {
         ServiceRegistry registry = new DefaultServiceRegistry();
         registry.register(helloService);
         NettyServer server = new NettyServer();
-        server.setSerializer(new KryoSerializer());
+        server.setSerializer(new ProtobufSerializer());
         server.start(9999);
     }
 }
