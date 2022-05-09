@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * 服务端需要哪些信息，才能唯一确定服务端需要调用的接口的方法呢？
+ *  RPC 请求实体类
+ *
+ *  当你要调用远程方法的时候，你需要先传输一个 RpcRequest 给对方，
+ *  RpcRequest 里面包含了要调用的目标方法和类的名称、参数等数据。
  *
  * @author C.Wang
  * @CreateTime 2022/4/24 20:18

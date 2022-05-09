@@ -1,10 +1,9 @@
 package com.wang.test;
 
-import com.wang.rpc.RpcClientProxy;
+import com.wang.rpc.transport.RpcClientProxy;
 import com.wang.rpc.api.HelloObject;
 import com.wang.rpc.api.HelloService;
-import com.wang.rpc.netty.client.NettyClient;
-import com.wang.rpc.serializer.HessianSerializer;
+import com.wang.rpc.transport.netty.client.NettyClient;
 import com.wang.rpc.serializer.ProtobufSerializer;
 
 /**
@@ -17,7 +16,7 @@ import com.wang.rpc.serializer.ProtobufSerializer;
 
 public class NettyTestClient {
     public static void main(String[] args) {
-        NettyClient client = new NettyClient("127.0.0.1", 9999);
+        NettyClient client = new NettyClient();
         client.setSerializer(new ProtobufSerializer());
         RpcClientProxy rpcClientProxy = new RpcClientProxy(client);
         HelloService helloService = rpcClientProxy.getProxy(HelloService.class);

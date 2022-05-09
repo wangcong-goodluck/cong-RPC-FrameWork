@@ -8,6 +8,11 @@ import java.io.Serializable;
 import java.net.ResponseCache;
 
 /**
+ *
+ * RPC 响应实体类
+ *
+ * 当服务端通过 RpcRequest 中的相关数据调用到目标服务的目标方法后，调用结果就通过 RpcResponse 返回给客户端。
+ *
  * @author C.Wang
  * @CreateTime 2022/4/24 20:30
  */

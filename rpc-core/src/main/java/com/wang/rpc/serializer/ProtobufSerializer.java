@@ -20,7 +20,6 @@ import static io.protostuff.runtime.RuntimeSchema.getSchema;
  * @CreateTime 2022/4/30 21:29
  */
 
-
 public class ProtobufSerializer implements CommonSerializer {
 
     private LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);

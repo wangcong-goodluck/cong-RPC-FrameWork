@@ -9,16 +9,16 @@ package com.wang.test;
 
 import com.wang.rpc.api.HelloObject;
 import com.wang.rpc.api.HelloService;
-import com.wang.rpc.RpcClientProxy;
+import com.wang.rpc.transport.RpcClientProxy;
 import com.wang.rpc.serializer.KryoSerializer;
-import com.wang.rpc.socket.client.SocketClient;
+import com.wang.rpc.transport.socket.client.SocketClient;
 
 /**
  * 客户端方面，我们需要通过动态代理，生成代理对象，并调用，动态代理会自动帮我们向服务端发送请求的
  */
 public class SocketTestClient {
     public static void main(String[] args) {
-        SocketClient client = new SocketClient("127.0.0.1", 9999);
+        SocketClient client = new SocketClient();
         client.setSerializer(new KryoSerializer());
         RpcClientProxy proxy = new RpcClientProxy(client);
         HelloService helloService = proxy.getProxy(HelloService.class);

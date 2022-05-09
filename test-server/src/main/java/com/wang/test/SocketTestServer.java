@@ -1,8 +1,9 @@
 package com.wang.test;
 
-import com.wang.rpc.registry.DefaultServiceRegistry;
+import com.wang.rpc.api.HelloService;
+import com.wang.rpc.provider.ServiceProviderImpl;
 import com.wang.rpc.serializer.HessianSerializer;
-import com.wang.rpc.socket.server.SocketServer;
+import com.wang.rpc.transport.socket.server.SocketServer;
 
 /**
  *测试服务提供方(服务器)
@@ -22,10 +23,8 @@ public class SocketTestServer {
         //RpcServer rpcServer = new RpcServer();
         //rpcServer.register(helloService, 9000);//注册完helloService后，服务器就自行启动了。一个服务器只能注册一个服务
 
-        DefaultServiceRegistry serviceRegistry = new DefaultServiceRegistry();
-        serviceRegistry.register(helloService);
-        SocketServer socketServer = new SocketServer(serviceRegistry);
+        SocketServer socketServer = new SocketServer("127.0.0.1", 9998);
         socketServer.setSerializer(new HessianSerializer());
-        socketServer.start(9999);
+        socketServer.publishService(helloService, HelloService.class);
     }
 }
