@@ -1,6 +1,8 @@
 package com.wang.rpc.transport.socket.client;
 
+import com.wang.rpc.registry.NacosServiceDiscovery;
 import com.wang.rpc.registry.NacosServiceRegistry;
+import com.wang.rpc.registry.ServiceDiscovery;
 import com.wang.rpc.registry.ServiceRegistry;
 import com.wang.rpc.transport.RpcClient;
 import com.wang.rpc.RpcMessageChecker;
@@ -30,13 +32,13 @@ import java.net.Socket;
 public class SocketClient implements RpcClient {
     private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
 
-    private final ServiceRegistry serviceRegistry;
-
-    public SocketClient() {
-        this.serviceRegistry = new NacosServiceRegistry();
-    }
+    private final ServiceDiscovery serviceDiscovery;
 
     private CommonSerializer serializer;
+
+    public SocketClient() {
+        this.serviceDiscovery = new NacosServiceDiscovery();
+    }
 
     /**
      * 直接使用Java的序列化方式，通过Socket传输。
@@ -49,7 +51,7 @@ public class SocketClient implements RpcClient {
             logger.error("未设置序列化器");
             throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
         }
-        InetSocketAddress inetSocketAddress = serviceRegistry.lookupService(rpcRequest.getInterfaceName());
+        InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest.getInterfaceName());
         try (Socket socket = new Socket()) {
             socket.connect(inetSocketAddress);
             OutputStream outputStream = socket.getOutputStream();

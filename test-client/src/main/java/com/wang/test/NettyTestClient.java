@@ -20,7 +20,8 @@ public class NettyTestClient {
         client.setSerializer(new ProtobufSerializer());
         RpcClientProxy rpcClientProxy = new RpcClientProxy(client);
         HelloService helloService = rpcClientProxy.getProxy(HelloService.class);
-        HelloObject res = new HelloObject(12, "This id a message");
+        HelloObject object = new HelloObject(12, "This id a message");
+        String res = helloService.hello(object);
         System.out.println(res);
     }
 }

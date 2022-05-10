@@ -10,6 +10,6 @@ package com.wang.rpc.provider;
 
 public interface ServiceProvider {
 
-    <T> void addServiceProvider(T service);//注册服务信息
+    <T> void addServiceProvider(T service, Class<T> serviceClass);//注册服务信息
     Object getServiceProvider(String serviceName);//获取服务信息
 }

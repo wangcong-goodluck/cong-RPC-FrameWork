@@ -6,6 +6,7 @@ import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.wang.rpc.enumeration.RpcError;
 import com.wang.rpc.exception.RpcException;
+import com.wang.rpc.util.NacosUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,23 +26,11 @@ public class NacosServiceRegistry implements ServiceRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(NacosServiceRegistry.class);
 
-    private static final String SERVER_ADDR = "127.0.0.1:8848";
-    private static final NamingService namingService;
 
-    /**
-     * 连接 Nacos 的过程写在静态代码块中，在类加载时自动连接。
-     */
+    private final NamingService namingService;
 
-    static {
-        try {
-            /**
-             *  Nacos的使用很简单，通过 NamingFactory创建 NamingService连接 Nacos
-             */
-            namingService = NamingFactory.createNamingService(SERVER_ADDR);
-        } catch (NacosException e) {
-            logger.error("连接到Nacos时有错误发生：", e);
-            throw new RpcException(RpcError.FAILED_TO_CONNECT_TO_SERVICE_REGISTRY);
-        }
+    public NacosServiceRegistry() {
+        this.namingService = NacosUtil.getNacosNamingService();
     }
 
     @Override
@@ -50,7 +39,7 @@ public class NacosServiceRegistry implements ServiceRegistry {
             /**
              *  namingService 提供 registerInstance 方法，可以直接向 Nacos 注册服务。
              */
-            namingService.registerInstance(serviceName, inetSocketAddress.getHostName(), inetSocketAddress.getPort());
+            NacosUtil.registerService(namingService, serviceName, inetSocketAddress);
         } catch (NacosException e) {
             logger.error("注册服务时有错误发生:", e);
             throw new RpcException(RpcError.REGISTER_SERVICE_FAILED);

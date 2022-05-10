@@ -1,6 +1,8 @@
 package com.wang.rpc.transport.netty.client;
 
+import com.wang.rpc.registry.NacosServiceDiscovery;
 import com.wang.rpc.registry.NacosServiceRegistry;
+import com.wang.rpc.registry.ServiceDiscovery;
 import com.wang.rpc.registry.ServiceRegistry;
 import com.wang.rpc.transport.RpcClient;
 import com.wang.rpc.RpcMessageChecker;
@@ -22,6 +24,8 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
+ *  NIO 方式消费侧客户端类
+ *
  * @author C.Wang
  * @CreateTime 2022/4/27 21:38
  */
@@ -32,7 +36,7 @@ public class NettyClient implements RpcClient {
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
     private static final Bootstrap bootstrap;
-    private final ServiceRegistry serviceRegistry;
+    private final ServiceDiscovery serviceDiscovery;
 
     private CommonSerializer serializer;
 
@@ -48,7 +52,7 @@ public class NettyClient implements RpcClient {
     }
 
     public NettyClient() {
-        this.serviceRegistry = new NacosServiceRegistry();
+        this.serviceDiscovery = new NacosServiceDiscovery();
     }
 
     @Override
@@ -59,7 +63,7 @@ public class NettyClient implements RpcClient {
         }
         AtomicReference<Object> result = new AtomicReference<>(null);
         try {
-            InetSocketAddress inetSocketAddress = serviceRegistry.lookupService(rpcRequest.getInterfaceName());
+            InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest.getInterfaceName());
             Channel channel = ChannelProvider.get(inetSocketAddress, serializer);
             if (channel.isActive()) {
                 channel.writeAndFlush(rpcRequest).addListener(future1 -> {
@@ -76,6 +80,7 @@ public class NettyClient implements RpcClient {
                 RpcMessageChecker.check(rpcRequest, rpcResponse);
                 result.set(rpcResponse.getData());
             } else {
+                channel.close();
                 System.exit(0);
             }
         } catch (InterruptedException e) {

@@ -18,7 +18,7 @@ import com.wang.rpc.transport.socket.server.SocketServer;
  */
 public class SocketTestServer {
     public static void main(String[] args) {
-        HelloServiceImpl helloService = new HelloServiceImpl();
+        HelloService helloService = new HelloServiceImpl2();
 
         //RpcServer rpcServer = new RpcServer();
         //rpcServer.register(helloService, 9000);//注册完helloService后，服务器就自行启动了。一个服务器只能注册一个服务

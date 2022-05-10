@@ -27,6 +27,7 @@ import java.net.InetSocketAddress;
 
 /**
  * Netty 服务端。并监听客户端的连接。
+ * NIO 方式 服务提供侧
  *
  * @author C.Wang
  * @CreateTime 2022/4/27 21:23
@@ -60,12 +61,12 @@ public class NettyServer implements RpcServer {
      * @param <T>
      */
     @Override
-    public <T> void publishService(Object service, Class<T> serviceClass) {
+    public <T> void publishService(T service, Class<T> serviceClass) {
         if (serializer == null) {
             logger.error("未设置序列化器");
             throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
         }
-        serviceProvider.addServiceProvider(service);
+        serviceProvider.addServiceProvider(service, serviceClass);
         serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(host, port));
         start();
 
