@@ -1,6 +1,7 @@
 package com.wang.rpc.transport.socket.server;
 
 import com.wang.rpc.handler.RequestHandler;
+import com.wang.rpc.hook.ShutdownHook;
 import com.wang.rpc.provider.ServiceProvider;
 import com.wang.rpc.registry.NacosServiceRegistry;
 import com.wang.rpc.transport.RpcServer;
@@ -9,7 +10,7 @@ import com.wang.rpc.exception.RpcException;
 import com.wang.rpc.provider.ServiceProviderImpl;
 import com.wang.rpc.registry.ServiceRegistry;
 import com.wang.rpc.serializer.CommonSerializer;
-import com.wang.rpc.transport.socket.util.ThreadPoolFactory;
+import com.wang.rpc.factory.ThreadPoolFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,12 +70,14 @@ public class SocketServer implements RpcServer {
 
     @Override
     public void start() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket()) {
+            serverSocket.bind(new InetSocketAddress(host, port));
             logger.info("服务器启动……");
+            ShutdownHook.getShutdownHook().addClearAllHook();
             Socket socket;
             while ((socket = serverSocket.accept()) != null) {
                 logger.info("消费者连接: {}:{}", socket.getInetAddress(), socket.getPort());
-                threadPool.execute(new RequestHandlerThread(socket, requestHandler, serviceRegistry, serializer));
+                threadPool.execute(new SocketRequestHandlerThread(socket, requestHandler, serviceRegistry, serializer));
             }
             threadPool.shutdown();
         } catch (IOException e) {

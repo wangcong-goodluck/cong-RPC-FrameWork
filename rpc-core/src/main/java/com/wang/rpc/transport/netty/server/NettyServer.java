@@ -1,5 +1,6 @@
 package com.wang.rpc.transport.netty.server;
 
+import com.wang.rpc.hook.ShutdownHook;
 import com.wang.rpc.transport.RpcServer;
 import com.wang.rpc.codec.CommonDecoder;
 import com.wang.rpc.codec.CommonEncoder;
@@ -110,6 +111,8 @@ public class NettyServer implements RpcServer {
                     });
             // 绑定端口，同步等待绑定成功
             ChannelFuture future = serverBootstrap.bind(host, port).sync();
+            // 启动钩子
+            ShutdownHook.getShutdownHook().addClearAllHook();
             // 等待服务端监听端口关闭
             future.channel().closeFuture().sync();
 
