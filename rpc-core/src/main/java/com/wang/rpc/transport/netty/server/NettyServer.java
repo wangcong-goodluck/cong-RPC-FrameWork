@@ -22,10 +22,13 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.sql.Time;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Netty 服务端。并监听客户端的连接。
@@ -105,9 +108,14 @@ public class NettyServer implements RpcServer {
                              * 体现了Netty中一个重要的设计模式：责任链模式
                              * 责任链上有多个处理器，每个处理器都会对数据进行加工，并将处理后的数据传给下一个处理器
                              */
-                            pipeline.addLast(new CommonEncoder(serializer));//编码器
-                            pipeline.addLast(new CommonDecoder());//解码器
-                            pipeline.addLast(new NettyServerHandler());//数据处理器
+                            pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS))
+                                    //编码器
+                                    .addLast(new CommonEncoder(serializer))
+                                    //解码器
+                                    .addLast(new CommonDecoder())
+                                    //数据处理器
+                                    .addLast(new NettyServerHandler());
+
                         }
                     });
             // 绑定端口，同步等待绑定成功
