@@ -1,6 +1,7 @@
 package com.wang.test;
 
 import com.wang.rpc.api.HelloService;
+import com.wang.rpc.serializer.CommonSerializer;
 import com.wang.rpc.transport.netty.server.NettyServer;
 import com.wang.rpc.provider.ServiceProviderImpl;
 import com.wang.rpc.registry.ServiceRegistry;
@@ -18,8 +19,8 @@ public class NettyTestServer {
     public static void main(String[] args) {
         HelloService helloService = new HelloServiceImpl();
 
-        NettyServer server = new NettyServer("127.0.0.1", 9999);
-        server.setSerializer(new ProtobufSerializer());
+        NettyServer server = new NettyServer("127.0.0.1", 9999, CommonSerializer.PROTOBUF_SERIALIZER);
+
         server.publishService(helloService, HelloService.class);
     }
 }

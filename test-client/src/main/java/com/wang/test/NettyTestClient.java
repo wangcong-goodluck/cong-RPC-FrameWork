@@ -1,5 +1,6 @@
 package com.wang.test;
 
+import com.wang.rpc.serializer.CommonSerializer;
 import com.wang.rpc.transport.RpcClientProxy;
 import com.wang.rpc.api.HelloObject;
 import com.wang.rpc.api.HelloService;
@@ -16,8 +17,7 @@ import com.wang.rpc.serializer.ProtobufSerializer;
 
 public class NettyTestClient {
     public static void main(String[] args) {
-        NettyClient client = new NettyClient();
-        client.setSerializer(new ProtobufSerializer());
+        NettyClient client = new NettyClient(CommonSerializer.PROTOBUF_SERIALIZER);
         RpcClientProxy rpcClientProxy = new RpcClientProxy(client);
         HelloService helloService = rpcClientProxy.getProxy(HelloService.class);
         HelloObject object = new HelloObject(12, "This id a message");

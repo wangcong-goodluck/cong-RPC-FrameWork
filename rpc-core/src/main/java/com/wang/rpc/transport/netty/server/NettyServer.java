@@ -11,6 +11,7 @@ import com.wang.rpc.provider.ServiceProviderImpl;
 import com.wang.rpc.registry.NacosServiceRegistry;
 import com.wang.rpc.registry.ServiceRegistry;
 import com.wang.rpc.serializer.CommonSerializer;
+import com.wang.rpc.transport.netty.client.NettyClient;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -45,13 +46,18 @@ public class NettyServer implements RpcServer {
     private final ServiceRegistry serviceRegistry;
     private final ServiceProvider serviceProvider;
 
-    private CommonSerializer serializer;
+    private final CommonSerializer serializer;
 
     public NettyServer(String host, int port) {
+        this(host, port, DEFAULT_SERIALIZER);
+    }
+
+    public NettyServer(String host, int port, Integer serializer) {
         this.host = host;
         this.port = port;
         serviceRegistry = new NacosServiceRegistry();
         serviceProvider = new ServiceProviderImpl();
+        this.serializer = CommonSerializer.getByCode(serializer);
     }
 
     /**
@@ -70,16 +76,11 @@ public class NettyServer implements RpcServer {
         serviceProvider.addServiceProvider(service, serviceClass);
         serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(host, port));
         start();
-
-
     }
 
     @Override
     public void start() {
-        if (serializer == null) {
-            logger.error("未设置序列化器");
-            throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
-        }
+        ShutdownHook.getShutdownHook().addClearAllHook();
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -111,8 +112,6 @@ public class NettyServer implements RpcServer {
                     });
             // 绑定端口，同步等待绑定成功
             ChannelFuture future = serverBootstrap.bind(host, port).sync();
-            // 启动钩子
-            ShutdownHook.getShutdownHook().addClearAllHook();
             // 等待服务端监听端口关闭
             future.channel().closeFuture().sync();
 
@@ -122,11 +121,6 @@ public class NettyServer implements RpcServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-    }
-
-    @Override
-    public void setSerializer(CommonSerializer serializer) {
-        this.serializer = serializer;
     }
 
 

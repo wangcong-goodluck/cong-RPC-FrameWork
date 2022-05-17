@@ -13,7 +13,7 @@ import com.wang.rpc.serializer.CommonSerializer;
 public interface RpcServer {
     void start();
 
-    void setSerializer(CommonSerializer serializer);
+    int DEFAULT_SERIALIZER = CommonSerializer.KRYO_SERIALIZER;
 
     //用于向 Nacos 注册服务
     <T> void publishService(T service, Class<T> serviceClass);
