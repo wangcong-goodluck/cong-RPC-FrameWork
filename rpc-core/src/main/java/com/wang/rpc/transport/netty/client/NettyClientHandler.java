@@ -2,6 +2,7 @@ package com.wang.rpc.transport.netty.client;
 
 import com.wang.rpc.entity.RpcRequest;
 import com.wang.rpc.entity.RpcResponse;
+import com.wang.rpc.factory.SingletonFactory;
 import com.wang.rpc.serializer.CommonSerializer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -28,6 +29,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponse>
 
     private static final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
 
+    private final UnprocessedRequests unprocessedRequests;
+
+    public NettyClientHandler() {
+        this.unprocessedRequests = SingletonFactory.getInstance(UnprocessedRequests.class);
+    }
+
     /**
      * 读取从服务端返回的消息
      *
@@ -39,9 +46,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponse>
     protected void channelRead0(ChannelHandlerContext ctx, RpcResponse msg) throws Exception {
         try {
             logger.info(String.format("客户端接收到消息：%s", msg));
-            AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse" + msg.getRequestId());
-            ctx.channel().attr(key).set(msg);
-            ctx.channel().close();
+            unprocessedRequests.complete(msg);
         } finally {
             ReferenceCountUtil.release(msg);
         }
