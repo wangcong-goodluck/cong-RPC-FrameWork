@@ -1,5 +1,7 @@
 package com.wang.rpc.transport.socket.client;
 
+import com.wang.rpc.loadbalancer.LoadBalancer;
+import com.wang.rpc.loadbalancer.RandomLoadBalancer;
 import com.wang.rpc.registry.NacosServiceDiscovery;
 import com.wang.rpc.registry.NacosServiceRegistry;
 import com.wang.rpc.registry.ServiceDiscovery;
@@ -17,6 +19,7 @@ import com.wang.rpc.transport.socket.util.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.XmlType;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -37,12 +40,20 @@ public class SocketClient implements RpcClient {
     private final CommonSerializer serializer;
 
     public SocketClient() {
-        this(DEFAULT_SERIALIZER);
+        this(DEFAULT_SERIALIZER, new RandomLoadBalancer());
+    }
+
+    public SocketClient(LoadBalancer loadBalancer) {
+        this(DEFAULT_SERIALIZER, loadBalancer);
+    }
+
+    public SocketClient(Integer serializer, LoadBalancer loadBalancer) {
+        this.serviceDiscovery = new NacosServiceDiscovery(loadBalancer);
+        this.serializer = CommonSerializer.getByCode(serializer);
     }
 
     public SocketClient(Integer serializer) {
-        this.serviceDiscovery = new NacosServiceDiscovery();
-        this.serializer = CommonSerializer.getByCode(serializer);
+        this(serializer, new RandomLoadBalancer());
     }
 
     /**
