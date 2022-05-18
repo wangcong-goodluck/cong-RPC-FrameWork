@@ -1,6 +1,7 @@
 package com.wang.rpc.transport.netty.server;
 
 import com.wang.rpc.hook.ShutdownHook;
+import com.wang.rpc.transport.AbstractRpcServer;
 import com.wang.rpc.transport.RpcServer;
 import com.wang.rpc.codec.CommonDecoder;
 import com.wang.rpc.codec.CommonEncoder;
@@ -39,15 +40,9 @@ import java.util.concurrent.TimeUnit;
  */
 
 
-public class NettyServer implements RpcServer {
+public class NettyServer extends AbstractRpcServer {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
-
-    private final String host;
-    private final int port;
-
-    private final ServiceRegistry serviceRegistry;
-    private final ServiceProvider serviceProvider;
 
     private final CommonSerializer serializer;
 
@@ -61,24 +56,7 @@ public class NettyServer implements RpcServer {
         serviceRegistry = new NacosServiceRegistry();
         serviceProvider = new ServiceProviderImpl();
         this.serializer = CommonSerializer.getByCode(serializer);
-    }
-
-    /**
-     *  publishService需要将服务保存在本地的注册表，同时注册到 Nacos上
-     *
-     * @param service
-     * @param serviceClass
-     * @param <T>
-     */
-    @Override
-    public <T> void publishService(T service, Class<T> serviceClass) {
-        if (serializer == null) {
-            logger.error("未设置序列化器");
-            throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
-        }
-        serviceProvider.addServiceProvider(service, serviceClass);
-        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(host, port));
-        start();
+        scanServices();
     }
 
     @Override

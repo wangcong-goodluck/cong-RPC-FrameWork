@@ -16,5 +16,5 @@ public interface RpcServer {
     int DEFAULT_SERIALIZER = CommonSerializer.KRYO_SERIALIZER;
 
     //用于向 Nacos 注册服务
-    <T> void publishService(T service, Class<T> serviceClass);
+    <T> void publishService(T service, String  serviceClass);
 }

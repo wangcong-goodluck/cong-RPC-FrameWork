@@ -4,6 +4,7 @@ import com.wang.rpc.handler.RequestHandler;
 import com.wang.rpc.hook.ShutdownHook;
 import com.wang.rpc.provider.ServiceProvider;
 import com.wang.rpc.registry.NacosServiceRegistry;
+import com.wang.rpc.transport.AbstractRpcServer;
 import com.wang.rpc.transport.RpcServer;
 import com.wang.rpc.enumeration.RpcError;
 import com.wang.rpc.exception.RpcException;
@@ -33,17 +34,12 @@ import java.util.concurrent.*;
  */
 
 
-public class SocketServer implements RpcServer {
+public class SocketServer extends AbstractRpcServer {
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
 
     private final ExecutorService threadPool;
-    private final String host;
-    private final int port;
     private final CommonSerializer serializer;
     private final RequestHandler requestHandler = new RequestHandler();
-
-    private final ServiceRegistry serviceRegistry;
-    private final ServiceProvider serviceProvider;
 
     /**
      * RpcService只需要负责启动即可
@@ -61,18 +57,9 @@ public class SocketServer implements RpcServer {
         this.serviceRegistry = new NacosServiceRegistry();
         this.serviceProvider = new ServiceProviderImpl();
         this.serializer = CommonSerializer.getByCode(serializer);
+        scanServices();
     }
 
-    @Override
-    public <T> void publishService(T service, Class<T> serviceClass) {
-        if (serializer == null) {
-            logger.error("未设置序列化器");
-            throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
-        }
-        serviceProvider.addServiceProvider(service, serviceClass);
-        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(host, port));
-        start();
-    }
 
     @Override
     public void start() {
